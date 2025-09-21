@@ -4,22 +4,22 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Feliz Primavera</title>
-<link rel="icon" type="image/png" href="girasol.png">
+<link rel="icon" type="image/png" href="favicon.png">
 <style>
   body {
     margin: 0;
     padding: 0;
     font-family: Arial, sans-serif;
     background: #fff8e1;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
     overflow: hidden;
-    position: relative;
   }
 
+  /* Pantalla de contraseña */
   #passwordBox {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
     text-align: center;
     z-index: 2;
   }
@@ -39,29 +39,28 @@
     font-weight: bold;
   }
 
+  /* Pantalla primavera */
   #springScreen {
-    display: none;
+    display: none;             /* empieza oculta */
     position: absolute;
     top: 0; left: 0;
     width: 100%;
     height: 100%;
     background: linear-gradient(to top, #fffde7, #fff8e1);
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    justify-content: center;   /* centra horizontalmente */
+    align-items: center;       /* centra verticalmente */
     flex-direction: column;
-    z-index: 1;
+    text-align: center;
   }
 
   #springMessage {
-    font-size: 3rem;
-    color: #131211;
+    font-size: 6vw;            
+    color: #11100c;
     text-shadow: 2px 2px 6px rgba(0,0,0,0.4);
     opacity: 0;
-    transform: scale(0.5);
     animation: fadeZoom 2s ease forwards;
-    text-align: center;
-    z-index: 2;
+    z-index: 2;               /* mensaje sobre el canvas */
+    position: relative;
   }
 
   @keyframes fadeZoom {
@@ -72,63 +71,65 @@
   canvas {
     position: absolute;
     top: 0; left: 0;
-    z-index: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;               /* canvas detrás del mensaje */
+  }
+
+  /* Ajustes para móvil */
+  @media (max-width: 600px) {
+    #springMessage {
+      font-size: 10vw;
+    }
   }
 </style>
 </head>
 <body>
 
+<!-- Pantalla de contraseña -->
 <div id="passwordBox">
   <input type="password" id="password" placeholder="Ingresá la clave">
   <button onclick="checkPassword()">Entrar</button>
 </div>
 
+<!-- Pantalla primavera -->
 <div id="springScreen">
-  <!-- El mensaje y el canvas se crearán dinámicamente -->
+  <canvas id="flowerCanvas"></canvas>
+  <h3 id="springMessage">🌟¡Feliz Primavera, mi sol cuántico, que tus días se llenen de magia, brillo y armonia!🌟</h3>
 </div>
 
 <script>
-const correctPassword = "0706";
-
 function checkPassword() {
   const password = document.getElementById("password").value;
-  if(password === correctPassword) {
-    // Ocultar la caja de contraseña
+  if (password === "0706") {  // clave correcta
     document.getElementById("passwordBox").style.display = "none";
-
     const springScreen = document.getElementById("springScreen");
     springScreen.style.display = "flex";
 
-    // Crear mensaje
-    const msg = document.createElement("h4");
-    msg.id = "springMessage";
-    msg.textContent = "⭐¡Feliz Primavera, mi sol cuántico, que tus días se llenen de magia, brillo y armonia!⭐";
-    springScreen.appendChild(msg);
-
-    // Forzar animación
-    void msg.offsetWidth;
+    // reinicia animación del mensaje
+    const msg = document.getElementById("springMessage");
+    msg.style.opacity = "0";
+    msg.style.animation = "none";
+    void msg.offsetWidth; // reinicia animación
     msg.style.animation = "fadeZoom 2s ease forwards";
 
-    // Crear canvas para flores
-    const canvas = document.createElement("canvas");
-    canvas.id = "flowerCanvas";
-    springScreen.appendChild(canvas);
-
-    startFlowers(canvas);
+    startFlowers();
   } else {
     alert("Clave incorrecta");
   }
 }
 
-function startFlowers(canvas) {
+function startFlowers() {
+  const canvas = document.getElementById("flowerCanvas");
   const ctx = canvas.getContext("2d");
 
-  function resizeCanvas() {
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight;
+
+  window.addEventListener("resize", () => {
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-  }
-  window.addEventListener("resize", resizeCanvas);
-  resizeCanvas();
+  });
 
   class Flower {
     constructor() {
@@ -140,45 +141,50 @@ function startFlowers(canvas) {
       this.spin = (Math.random() - 0.5) * 0.02;
       this.type = Math.floor(Math.random() * 3);
     }
+
     draw() {
       ctx.save();
       ctx.translate(this.x, this.y);
       ctx.rotate(this.angle);
-      if(this.type === 0) {
-        for(let i=0;i<5;i++){
-          ctx.rotate((2*Math.PI)/5);
+
+      if (this.type === 0) {
+        for (let i = 0; i < 5; i++) {
+          ctx.rotate((2 * Math.PI) / 5);
           ctx.beginPath();
-          ctx.ellipse(0, -this.size/2, this.size/3, this.size, 0, 0, 2*Math.PI);
+          ctx.ellipse(0, -this.size / 2, this.size / 3, this.size, 0, 0, 2 * Math.PI);
           ctx.fillStyle = "#ffeb3b";
           ctx.fill();
         }
-      } else if(this.type===1){
-        for(let i=0;i<12;i++){
-          ctx.rotate((2*Math.PI)/12);
+      } else if (this.type === 1) {
+        for (let i = 0; i < 12; i++) {
+          ctx.rotate((2 * Math.PI) / 12);
           ctx.beginPath();
-          ctx.ellipse(0,-this.size/2,this.size/5,this.size,0,0,2*Math.PI);
-          ctx.fillStyle="#fbc02d";
+          ctx.ellipse(0, -this.size / 2, this.size / 5, this.size, 0, 0, 2 * Math.PI);
+          ctx.fillStyle = "#fbc02d";
           ctx.fill();
         }
       } else {
-        for(let i=0;i<8;i++){
-          ctx.rotate((2*Math.PI)/8);
+        for (let i = 0; i < 8; i++) {
+          ctx.rotate((2 * Math.PI) / 8);
           ctx.beginPath();
-          ctx.arc(0,-this.size/2,this.size/2.5,0,2*Math.PI);
-          ctx.fillStyle="#fff176";
+          ctx.arc(0, -this.size / 2, this.size / 2.5, 0, 2 * Math.PI);
+          ctx.fillStyle = "#fff176";
           ctx.fill();
         }
       }
+
       ctx.beginPath();
-      ctx.arc(0,0,this.size/3,0,2*Math.PI);
-      ctx.fillStyle="#f57f17";
+      ctx.arc(0, 0, this.size / 3, 0, 2 * Math.PI);
+      ctx.fillStyle = "#f57f17";
       ctx.fill();
+
       ctx.restore();
     }
+
     update() {
       this.y -= this.speed;
       this.angle += this.spin;
-      if(this.y < -50){
+      if (this.y < -50) {
         this.y = canvas.height + 50;
         this.x = Math.random() * canvas.width;
         this.type = Math.floor(Math.random() * 3);
@@ -187,19 +193,16 @@ function startFlowers(canvas) {
     }
   }
 
-  const flowers=[];
-  for(let i=0;i<40;i++) flowers.push(new Flower());
+  const flowers = [];
+  for (let i = 0; i < 40; i++) flowers.push(new Flower());
 
-  function animate(){
-    ctx.clearRect(0,0,canvas.width,canvas.height);
-    flowers.forEach(f=>f.update());
+  function animate() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    flowers.forEach(f => f.update());
     requestAnimationFrame(animate);
   }
   animate();
 }
 </script>
-
 </body>
 </html>
-
-
